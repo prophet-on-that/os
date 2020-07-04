@@ -82,20 +82,32 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 	const size_t index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
 }
+
+/* Scroll the terminal up one line. */
+void terminal_scroll(void) {
+  for (size_t row = 1; row < VGA_HEIGHT; ++row)
+    for (size_t col = 0; col < VGA_WIDTH; ++col)
+      terminal_buffer[(row - 1) * VGA_HEIGHT + col] = terminal_buffer[row * VGA_HEIGHT + col];
+}
+
+void bump_row(void) {
+  if (++terminal_row == VGA_HEIGHT) {
+    terminal_scroll();
+    --terminal_row;
+  }
+}
  
 void terminal_putchar(char c) 
 {
   if (c == '\n') {
     terminal_column = 0;
-		if (++terminal_row == VGA_HEIGHT)
-			terminal_row = 0;
+    bump_row();
     return;
   }
 	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
-		if (++terminal_row == VGA_HEIGHT)
-			terminal_row = 0;
+    bump_row();
 	}
 }
  
@@ -109,7 +121,7 @@ void terminal_writestring(const char* data)
 {
 	terminal_write(data, strlen(data));
 }
- 
+
 void kernel_main(void) 
 {
 	/* Initialize terminal interface */
