@@ -87,7 +87,13 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
 void terminal_scroll(void) {
   for (size_t row = 1; row < VGA_HEIGHT; ++row)
     for (size_t col = 0; col < VGA_WIDTH; ++col)
-      terminal_buffer[(row - 1) * VGA_HEIGHT + col] = terminal_buffer[row * VGA_HEIGHT + col];
+      terminal_buffer[(row - 1) * VGA_WIDTH + col] = terminal_buffer[row * VGA_WIDTH + col];
+
+  /* Clear last row */
+  for (size_t col = 0; col < VGA_WIDTH; ++col)
+    terminal_putentryat(' ', terminal_color, col, VGA_HEIGHT - 1);
+
+  terminal_row = VGA_HEIGHT - 1;
 }
 
 void bump_row(void) {
@@ -99,15 +105,18 @@ void bump_row(void) {
  
 void terminal_putchar(char c) 
 {
+  if (terminal_row >= VGA_HEIGHT)
+    terminal_scroll();
+
   if (c == '\n') {
     terminal_column = 0;
-    bump_row();
+    ++terminal_row;
     return;
   }
 	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
 	if (++terminal_column == VGA_WIDTH) {
 		terminal_column = 0;
-    bump_row();
+    ++terminal_row;
 	}
 }
  
@@ -126,8 +135,7 @@ void kernel_main(void)
 {
 	/* Initialize terminal interface */
 	terminal_initialize();
- 
-	/* Newline support is left as an exercise. */
+
   for (int i = 0; i < (int)VGA_HEIGHT + 5; i++) {
     char *str = "A\n";
     str[0] = 'A' + i;
