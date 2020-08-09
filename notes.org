@@ -1,0 +1,2 @@
+* Keyboard driver
+  - [[https://forum.osdev.org/viewtopic.php?f=1&t=9746][Forum post of keyboard driver using IO ports (not interrupts)]]
