@@ -136,6 +136,15 @@ void kernel_main(void)
 	/* Initialize terminal interface */
 	terminal_initialize();
 
+  /* Test colours */
+  /* for (int fg = 0; fg < 8; fg++) { */
+  /*   for (int bg = 0; bg < 8; bg++) { */
+  /*     terminal_setcolor(vga_entry_color(fg, bg)); */
+  /*     terminal_putchar('A'); */
+  /*   } */
+  /*   terminal_putchar('\n'); */
+  /* } */
+
   for (int i = 0; i < (int)VGA_HEIGHT + 5; i++) {
     char *str = "A\n";
     str[0] = 'A' + i;
